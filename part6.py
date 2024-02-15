@@ -8,6 +8,7 @@ audio, fs = sf.read("quickfox.wav", always_2d=True)
 print(audio)
 print(audio.shape)
 
+stereo = np.asarray([audio,audio])
 # Copy left channel to right channel
 audio_stereo = np.append(audio,audio,1)
 print(audio_stereo)
