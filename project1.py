@@ -9,7 +9,7 @@ import sounddevice as sd
 # Record mode setting
 #   if == 1, prompt user for rec_fname, record and save to file
 #   if == 0, prompt user for rec_fname to analyze
-record_mode = 1
+record_mode = 0
 duration = 5
 fs = 48000
 sd.default.device = 0
@@ -28,6 +28,7 @@ def record(rec_fname):
     plt.xlabel('Time (seconds)')
     plt.ylabel('Amplitude')
     plt.title('Audio waveform - '+rec_fname)
+    # Save plot then display it
     plt.savefig(rec_fname+"-TD.png")
     plt.show()
     
