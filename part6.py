@@ -4,39 +4,27 @@ import soundfile as sf
 # Ear distance in meters
 ear_distance = 0.1854
 
-audio, fs = sf.read("quickfox.wav", always_2d=True)
-print(audio)
+audio, fs = sf.read("quickfox.wav")
 print(audio.shape)
 
-stereo = np.asarray([audio,audio])
-# Copy left channel to right channel
-audio_stereo = np.append(audio,audio,1)
-print(audio_stereo)
-print(audio_stereo.shape)
-sf.write("teamOrnstein-stereosoundfile-0ms.wav",audio_stereo,fs)
+def delay_audio(audio,delay_samples):
+    delayed_audio = np.zeros_like(audio)
+    # Delay audio
+    delayed_audio[delay_samples:] = audio[:-delay_samples]
+    # Concat and transpose
+    stereo_delayed = np.asarray([audio,delayed_audio]).T
+    return stereo_delayed
 
-# Delay by 26 samples (avghead)
-audio_avghead = audio_stereo
-# Calculate delay in samples
-avghead_delay = int(ear_distance / 343 * fs)
-print(avghead_delay)
-audio_avghead[1, avghead_delay:] = audio_avghead[1, :-avghead_delay]
-# audio_avghead[1] = np.concatenate(([0] * avghead_delay, audio_avghead[1][:-avghead_delay]))
-print(audio_avghead.shape)
-print(audio_avghead)
-sf.write("teamOrnstein-stereosoundfile-avghead.wav",audio_avghead,fs)
+sf.write("teamOrnstein-stereosoundfile-0ms.wav",audio,fs)
 
-# Delay by 1ms
-audio_1ms = audio_stereo
-audio_1ms[1] = np.concatenate(([0] * int(fs * 0.001), audio_1ms[1][:-int(fs * 0.001)]))
+audio_avghead = delay_audio(audio,int(ear_distance / 343 * fs))
+sf.write("teamOrnstein-stereosoundfile-avghead.wav", audio_avghead,fs)
+
+audio_1ms = delay_audio(audio,int(fs * 0.001))
 sf.write("teamOrnstein-stereosoundfile-1ms.wav",audio_1ms,fs)
 
-# Delay by 10ms
-audio_10ms = audio_stereo
-audio_10ms[1] = np.concatenate(([0] * int(fs * 0.01), audio_10ms[1][:-int(fs * 0.01)]))
+audio_10ms = delay_audio(audio,int(fs * 0.01))
 sf.write("teamOrnstein-stereosoundfile-10ms.wav",audio_10ms,fs)
 
-# Delay by 100ms
-audio_100ms = audio_stereo
-audio_100ms[1] = np.concatenate(([0] * int(fs * 0.1), audio_100ms[1][:-int(fs * 0.1)]))
+audio_100ms = delay_audio(audio,int(fs * 0.1))
 sf.write("teamOrnstein-stereosoundfile-100ms.wav",audio_100ms,fs)
